@@ -90,7 +90,7 @@ CURRENT=$(lipc-get-prop com.lab126.appmgrd activeApp)
 echo "CURRENT:$CURRENT" >> $LOG
 echo "My PID is $$" >> $LOG
 sleep 10
-while true; do
+while false; do
     CURRENT=$(lipc-get-prop com.lab126.appmgrd activeApp)
     if [ "$CURRENT" != "$APP_ID" ]; then
         echo "App is no longer active → stop network cycling" >> $LOG
