@@ -80,7 +80,7 @@ fi
 
 lipc-set-prop com.lab126.appmgrd start app://$APP_ID
 
-ON_TIME=15      # seconds Wi-Fi stays on
+ON_TIME=30      # seconds Wi-Fi stays on
 OFF_TIME=30     # seconds Wi-Fi stays off (battery saving)
 
 LOG="/mnt/us/documents/weblaunch-log.txt"
@@ -88,22 +88,23 @@ LOG="/mnt/us/documents/weblaunch-log.txt"
 echo "=== Log started: $(date) ===" >> "$LOG"
 CURRENT=$(lipc-get-prop com.lab126.appmgrd activeApp)
 echo "CURRENT:$CURRENT" >> $LOG
-lipc-probe com.lab126.appmgrd -a >> $LOG
-
+echo "My PID is $$" >> $LOG
+sleep 10
 while true; do
-	CURRENT=$(lipc-get-prop com.lab126.appmgrd currentAppId)
-	if [ "$CURRENT" != "$APP_ID" ]; then
-        # App is no longer active → stop network cycling
+    CURRENT=$(lipc-get-prop com.lab126.appmgrd activeApp)
+    if [ "$CURRENT" != "$APP_ID" ]; then
+        echo "App is no longer active → stop network cycling" >> $LOG
+        sleep 1
         lipc-set-prop com.lab126.cmd wirelessEnable 1   # optional restore
         exit 0
     fi
-    # Wi-Fi ON
+    # echo "Wi-Fi ON" >> $LOG
     lipc-set-prop com.lab126.cmd wirelessEnable 1
     
 	# Allow page to reload
     sleep "$ON_TIME"
 
-    # Wi-Fi OFF
+    # echo "Wi-Fi OFF" >> $LOG
     lipc-set-prop com.lab126.cmd wirelessEnable 0
 
     # Battery-saving sleep
