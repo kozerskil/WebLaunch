@@ -188,25 +188,39 @@
           if (sessionSettings.landscape)
             b.device.orientation = b.enums.orientations.landscape;
 
-          var count = 0;
           function createEvent(data) {
-            count++;
             var ev = window.document.createEvent("Event");
             ev.initEvent("network", true, true);
             ev.data = data;
             window.document.dispatchEvent(ev);
           }
-          setInterval(function () {
-            createEvent({ interval: count });
+
+          function turnOn() {
+            kindle.net.setWirelessState("on");
             setTimeout(function () {
-              createEvent({ timeout: count });
-            }, 1000);
-          }, 5 * 1000);
+              createEvent({ online: true });
+            }, 20 * 1000);
+          }
+
+          function turnOff() {
+            kindle.net.setWirelessState("off");
+            setTimeout(function () {
+              createEvent({ online: false });
+            }, 5 * 1000);
+          }
+
+          function cycle() {
+            turnOn();
+            setTimeout(turnOff, 30 * 1000);
+          }
+          setInterval(cycle, 60 * 1000);
+          setTimeout(turnOff, 5 * 1000);
         }
 
         //-------------------------------------------------------------
         // restore status bar on close
         function closeApp() {
+          kindle.net.setWirelessState("on");
           if (preventScreenSaverStateBackup !== null)
             setPreventScreenSaverState(preventScreenSaverStateBackup);
 
