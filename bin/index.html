@@ -195,26 +195,27 @@
             window.document.dispatchEvent(ev);
           }
 
+          kindle.net.registerNetworkEventListener(function (event) {
+            if (event === "interfacechange") {
+              var state = { online: kindle.net.getWirelessState() === "on" };
+              createEvent(state);
+            }
+          });
+
           function turnOn() {
             kindle.net.setWirelessState("on");
-            setTimeout(function () {
-              createEvent({ online: true });
-            }, 20 * 1000);
           }
 
           function turnOff() {
             kindle.net.setWirelessState("off");
-            setTimeout(function () {
-              createEvent({ online: false });
-            }, 5 * 1000);
           }
 
           function cycle() {
             turnOn();
             setTimeout(turnOff, 30 * 1000);
           }
-          setInterval(cycle, 60 * 1000);
-          setTimeout(turnOff, 5 * 1000);
+          setInterval(cycle, 30 * 60 * 1000);
+          setTimeout(turnOff, 10 * 1000);
         }
 
         //-------------------------------------------------------------
