@@ -232,8 +232,11 @@
             turnOn();
             setTimeout(turnOff, 30 * 1000);
           }
-          setInterval(cycle, 60 * 1000);
+          setInterval(cycle, 30 * 60 * 1000);
           setTimeout(turnOff, 15 * 1000);
+          setTimeout(function () {
+            requestBattLevelState(onBatteryState);
+          }, 5 * 1000);
         }
 
         //-------------------------------------------------------------
