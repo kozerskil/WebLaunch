@@ -164,16 +164,6 @@
           );
         }
 
-        function sendEvent() {
-          requestBattLevelState(function (battLevel) {
-            var state = {
-              online: kindle.net.getWirelessState() === "on",
-              level: battLevel,
-            };
-            triggerEvent(state);
-          });
-        }
-
         //=============================================================
         // Event handlers
         //=============================================================
@@ -213,16 +203,20 @@
           if (sessionSettings.landscape)
             b.device.orientation = b.enums.orientations.landscape;
 
-          function triggerEvent(data) {
+          function onBatteryState(battLevel) {
             var ev = window.document.createEvent("Event");
             ev.initEvent("network", true, true);
+            var data = {
+              online: kindle.net.getWirelessState() === "on",
+              level: battLevel,
+            };
             ev.data = data;
             window.document.dispatchEvent(ev);
           }
 
           kindle.net.registerNetworkEventListener(function (event) {
             if (event === "interfacechange") {
-              sendEvent();
+              requestBattLevelState(onBatteryState);
             }
           });
 
@@ -238,9 +232,8 @@
             turnOn();
             setTimeout(turnOff, 30 * 1000);
           }
-          setInterval(cycle, 30 * 60 * 1000);
-          setTimeout(turnOff, 10 * 1000);
-          sendEvent();
+          setInterval(cycle, 60 * 1000);
+          setTimeout(turnOff, 15 * 1000);
         }
 
         //-------------------------------------------------------------
