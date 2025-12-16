@@ -67,6 +67,7 @@
           enablePreventScreenSaver: false,
           landscape: false,
           autoRefresh: 0,
+          refresh: 30,
         };
 
         //-------------------------------------------------------------
@@ -152,6 +153,23 @@
           );
         }
 
+        function msUntilMorning() {
+          var now = new Date();
+          var morning = new Date(now);
+          morning.setHours(6, 0, 0, 0);
+
+          if (morning <= now) {
+            morning.setDate(morning.getDate() + 1);
+          }
+
+          return morning.getTime() - now.getTime();
+        }
+
+        function isNight() {
+          var h = new Date().getHours();
+          return h >= 0 && h < 6;
+        }
+
         function requestBattLevelState(callback) {
           // lipc-get-prop com.lab126.powerd battLevel
           pillowRun(
@@ -170,7 +188,9 @@
 
         //-------------------------------------------------------------
         function openApp(state) {
-          console.log("= openApp ===");
+          console.log(
+            "= openApp ======================================================================================="
+          );
           registerPowerButtonCallback();
 
           if (sessionSettings.enablePreventScreenSaver) {
@@ -207,6 +227,9 @@
 
           function turnOn() {
             kindle.net.ensureWifiConnection("never", function (status) {
+              console.log(
+                "= turnOn ======================================================================================="
+              );
               if (status === "success") {
                 requestBattLevelState(onBatteryState);
               }
@@ -220,12 +243,18 @@
           function cycle() {
             turnOn();
             setTimeout(turnOff, 15 * 1000);
+            const nextInterval = isNight()
+              ? msUntilMorning()
+              : sessionSettings.refresh * 60 * 1000;
+            setTimeout(cycle, nextInterval);
+            console.log(
+              "= setTimeout " +
+                nextInterval +
+                " ======================================================================================="
+            );
           }
-          setInterval(cycle, 60 * 1000);
-          setTimeout(turnOff, 15 * 1000);
-          setTimeout(function () {
-            requestBattLevelState(onBatteryState);
-          }, 100);
+
+          cycle();
         }
 
         //-------------------------------------------------------------
