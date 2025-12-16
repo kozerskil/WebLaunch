@@ -221,18 +221,18 @@
 
           function turnOn() {
             console.log("= connecting =======================");
-            kindle.net.setWirelessState("on");
-            // kindle.net.ensureWifiConnection("never", function (status) {
-            // if (status === "success") {
-            // while (kindle.net.getActiveInterface() === "none") {}
-            console.log("= connected =======================");
-            requestBattLevelState(onBatteryState, "turnOn");
-            // }
-            // });
+            // kindle.net.setWirelessState("on");
+            kindle.net.ensureWifiConnection("never", function (status) {
+              console.log("= connecting ======================= " + status);
+              if (status === "success") {
+                console.log("= connected =======================");
+                requestBattLevelState(onBatteryState, "turnOn");
+              }
+            });
           }
 
           function turnOff() {
-            // kindle.net.setWirelessState("off");
+            kindle.net.setWirelessState("off");
             console.log("= disconnected =======================");
           }
 
@@ -240,11 +240,11 @@
             turnOn();
             setTimeout(turnOff, 15 * 1000);
           }
-          setInterval(cycle, 60 * 1000);
+          setInterval(cycle, 30 * 1000);
           setTimeout(turnOff, 15 * 1000);
           setTimeout(function () {
             requestBattLevelState(onBatteryState, "initial");
-          }, 1000);
+          }, 100);
         }
 
         //-------------------------------------------------------------
