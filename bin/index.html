@@ -152,7 +152,7 @@
           );
         }
 
-        function requestBattLevelState(callback, id) {
+        function requestBattLevelState(callback) {
           // lipc-get-prop com.lab126.powerd battLevel
           pillowRun(
             "return nativeBridge.getIntLipcProperty('com.lab126.powerd', 'battLevel');",
@@ -169,7 +169,6 @@
         //=============================================================
 
         //-------------------------------------------------------------
-        // Open application
         function openApp(state) {
           console.log("= openApp ===");
           registerPowerButtonCallback();
@@ -178,30 +177,25 @@
             requestPreventScreenSaverState();
           }
 
-          // Enable networking if desired
           if (sessionSettings.enableWireless) {
             kindle.net.setWirelessState("on");
           }
 
-          // Load url
           const window = kindle.chrome.createContentWindow(
             sessionSettings.url + "?t=" + Date.now()
           );
 
-          // Set window title
           kindle.chrome.setTitleBar("", sessionSettings.title);
 
-          // Remove statusBar if desired
-          if (sessionSettings.hideStatusbar)
+          if (sessionSettings.hideStatusbar) {
             pillowRun("nativeBridge.hideMe();");
+          }
 
-          // Set orientation to landscape if desired
-          if (sessionSettings.landscape)
+          if (sessionSettings.landscape) {
             b.device.orientation = b.enums.orientations.landscape;
+          }
 
           function onBatteryState(battLevel) {
-            console.log("===== location:" + window.document.location);
-            console.log("===== battLevel:" + battLevel);
             const newUrl =
               sessionSettings.url +
               "?battery=" +
@@ -209,41 +203,28 @@
               "&t=" +
               Date.now();
             window.document.location = newUrl;
-            console.log("===== newUrl:" + newUrl);
-            console.log("===== location:" + window.document.location);
           }
 
-          // kindle.net.registerNetworkEventListener(function (event) {
-          //   if (event === "interfacechange") {
-          //     requestBattLevelState(onBatteryState);
-          //   }
-          // });
-
           function turnOn() {
-            console.log("= connecting =======================");
-            // kindle.net.setWirelessState("on");
             kindle.net.ensureWifiConnection("never", function (status) {
-              console.log("= connecting ======================= " + status);
               if (status === "success") {
-                console.log("= connected =======================");
-                requestBattLevelState(onBatteryState, "turnOn");
+                requestBattLevelState(onBatteryState);
               }
             });
           }
 
           function turnOff() {
             kindle.net.setWirelessState("off");
-            console.log("= disconnected =======================");
           }
 
           function cycle() {
             turnOn();
             setTimeout(turnOff, 15 * 1000);
           }
-          setInterval(cycle, 30 * 1000);
+          setInterval(cycle, 60 * 1000);
           setTimeout(turnOff, 15 * 1000);
           setTimeout(function () {
-            requestBattLevelState(onBatteryState, "initial");
+            requestBattLevelState(onBatteryState);
           }, 100);
         }
 
