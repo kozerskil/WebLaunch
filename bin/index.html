@@ -157,12 +157,6 @@
           pillowRun(
             "return nativeBridge.getIntLipcProperty('com.lab126.powerd', 'battLevel');",
             function (state) {
-              console.log(
-                "= battery ====================================" +
-                  state +
-                  "==" +
-                  id
-              );
               if (typeof state === "number") {
                 callback(state);
               }
@@ -190,14 +184,9 @@
           }
 
           // Load url
-          const window = kindle.chrome.createContentWindow(sessionSettings.url);
-
-          // auto refresh
-          if (sessionSettings.autoRefresh) {
-            setInterval(function () {
-              window.document.location = window.document.location;
-            }, sessionSettings.autoRefresh * 1000);
-          }
+          const window = kindle.chrome.createContentWindow(
+            sessionSettings.url + "?t=" + Date.now()
+          );
 
           // Set window title
           kindle.chrome.setTitleBar("", sessionSettings.title);
@@ -211,7 +200,17 @@
             b.device.orientation = b.enums.orientations.landscape;
 
           function onBatteryState(battLevel) {
-            location.replace("?battery=" + battLevel + "&t=" + Date.now());
+            console.log("===== location:" + window.document.location);
+            console.log("===== battLevel:" + battLevel);
+            const newUrl =
+              sessionSettings.url +
+              "?battery=" +
+              battLevel +
+              "&t=" +
+              Date.now();
+            window.document.location = newUrl;
+            console.log("===== newUrl:" + newUrl);
+            console.log("===== location:" + window.document.location);
           }
 
           // kindle.net.registerNetworkEventListener(function (event) {
@@ -225,7 +224,7 @@
             kindle.net.setWirelessState("on");
             // kindle.net.ensureWifiConnection("never", function (status) {
             // if (status === "success") {
-            while (kindle.net.getActiveInterface() === "none") {}
+            // while (kindle.net.getActiveInterface() === "none") {}
             console.log("= connected =======================");
             requestBattLevelState(onBatteryState, "turnOn");
             // }
