@@ -76,6 +76,6 @@ then
 fi
 
 ###############################################################################
-## Start the application
+## Start the application lipc-set-prop com.lab126.appmgrd start app://com.PaulFreund.WebLaunch
 
 lipc-set-prop com.lab126.appmgrd start app://$APP_ID
