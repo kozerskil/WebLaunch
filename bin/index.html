@@ -188,9 +188,7 @@
 
         //-------------------------------------------------------------
         function openApp(state) {
-          console.log(
-            "= openApp ======================================================================================="
-          );
+          console.log("= openApp ====================");
           registerPowerButtonCallback();
 
           if (sessionSettings.enablePreventScreenSaver) {
@@ -215,23 +213,24 @@
             b.device.orientation = b.enums.orientations.landscape;
           }
 
-          function onBatteryState(battLevel) {
-            const newUrl =
-              sessionSettings.url +
-              "?battery=" +
-              battLevel +
-              "&t=" +
-              Date.now();
-            window.document.location = newUrl;
+          function onBatteryState(nextInterval) {
+            return function (battLevel) {
+              const newUrl =
+                sessionSettings.url +
+                "?battery=" +
+                battLevel +
+                "&next=" +
+                nextInterval +
+                "&t=" +
+                Date.now();
+              window.document.location = newUrl;
+            };
           }
 
-          function turnOn() {
+          function turnOn(nextInterval) {
             kindle.net.ensureWifiConnection("never", function (status) {
-              console.log(
-                "= turnOn ======================================================================================="
-              );
               if (status === "success") {
-                requestBattLevelState(onBatteryState);
+                requestBattLevelState(onBatteryState(nextInterval));
               }
             });
           }
@@ -241,17 +240,12 @@
           }
 
           function cycle() {
-            turnOn();
-            setTimeout(turnOff, 15 * 1000);
             const nextInterval = isNight()
               ? msUntilMorning()
               : sessionSettings.refresh * 60 * 1000;
+            turnOn(nextInterval);
             setTimeout(cycle, nextInterval);
-            console.log(
-              "= setTimeout " +
-                nextInterval +
-                " ======================================================================================="
-            );
+            setTimeout(turnOff, 15 * 1000);
           }
 
           cycle();
